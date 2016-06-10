@@ -1,0 +1,44 @@
+def addTodb(request):
+    """questions = Question.objects.all()[:]
+    for question in questions:
+        question.rating = question.get_real_rating()
+        question.save()
+
+    return HttpResponse(bytes("OK", "utf-8"), content_type='text/plain')
+"""
+    tags = [
+        Tag.objects.filter(text="Bender")[0],
+        Tag.objects.filter(text="black-jack")[0],
+        Tag.objects.filter(text="Voloshin")[0],
+        Tag.objects.filter(text="Putin")[0],
+        Tag.objects.filter(text="Vodka")[0],
+    ]
+    profiles = [
+        Profile.objects.filter(login="Petya")[0],
+        Profile.objects.filter(login="Vasya")[0],
+        Profile.objects.filter(login="Jenya")[0],
+        Profile.objects.filter(login="Vanya")[0],
+        Profile.objects.filter(login="Las")[0],
+    ]
+
+    for i in range(20, 30):
+        # Вопрос
+        question = Question.objects.create(title='Question #{} How to build a moon park?'.format(i),
+            content="Lorem ipsum dolor sit amet, at eius persecuti vel, ancillae dissentiet no, eripuit eleifend corrumpit ad eos. Ut vivendo copiosae usu,  nec illum fabellas. Cum ne eleifend gubergren moderatius, mutat docendi",
+            author=profiles[random.randint(0, 4)])
+        # Тэги
+        for j in range(random.randint(0, 4), 4):
+            question.tags.add(tags[j])
+        #  Лайки вопроса
+        for k in range(random.randint(0, 4)):
+            Like.objects.create(profile=profiles[k], like=True, question=question)
+        question.rating = question.get_rating()
+        # Ответы
+        for j in range(random.randint(0, 6)):
+            answer = Answer.objects.create(content="Lorem ipsum dolor sit amet, at eius persecuti vel, ancillae dissentiet no, eripuit eleifend corrumpit ad eos. Ut vivendo copiosae usu,  nec illum fabellas. Cum ne eleifend gubergren moderatius, mutat docendi",
+                question=question, author=profiles[random.randint(0, 4)], is_correct=False)
+            # Лайки ответа
+            for k in range(random.randint(0, 4)):
+                Like.objects.create(profile=profiles[k], like=True, answer=answer)
+
+    return HttpResponse(bytes("OK", "utf-8"), content_type='text/plain')

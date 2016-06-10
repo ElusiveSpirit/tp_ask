@@ -1,0 +1,38 @@
+<div class="text-center ">
+    <nav>
+      <ul class="pagination" >
+
+        {% if page.number == 1 %}
+          <li class="disabled">
+              <a  href="#" aria-label="Previous">
+        {% else %}
+          <li>
+              <a  href="{{ paginator.baseurl }}{{ page.previous_page_number }}" aria-label="Previous">
+        {% endif %}
+                <span aria-hidden="true">&laquo;</span>
+            </a>
+        </li>
+        {% for p in paginator.page_range %}
+          {% if p == page.number %}
+            <li class="active">
+          {% else %}
+            <li>
+          {% endif %}
+              <a href="{{ paginator.baseurl }}{{ p }}">
+                  {{ p }}
+              </a>
+            </li>
+        {% endfor %}
+        {% if page.number == paginator.num_pages %}
+          <li class="disabled">
+              <a href="#" aria-label="Next">
+        {% else %}
+          <li>
+              <a href="{{ paginator.baseurl }}{{ page.next_page_number }}" aria-label="Next">
+        {% endif %}
+              <span aria-hidden="true">&raquo;</span>
+            </a>
+        </li>
+      </ul>
+    </nav>
+</div>

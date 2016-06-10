@@ -1,0 +1,7 @@
+<div class="nav navbar-nav navbar-right ask-nav-log">
+  <div class="ask-log">
+      <a href="{% url "ask:signin" %}?next={{ request.path }}">Log in</a>
+      <a href="{% url "ask:signup" %}?next={{ request.path }}" class="ask-padding-left">Register</a>
+  </div>
+  <div class="ask-helper"></div>
+</div>

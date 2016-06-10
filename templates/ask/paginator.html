@@ -1,0 +1,27 @@
+{% extends "ask/base.html" %}
+
+
+{% block nav_bar_form %}
+  <div class="form-group">
+      {% if best == "True" %}
+        <input type="hidden" name="best" value="True"/>
+        <button onclick="switchState()" class="btn btn-primary">Show best</button>
+      {% else %}
+      <input type="hidden" name="best" value="False"/>
+      <button onclick="switchState()" class="btn btn-default">Show best</button>
+      {% endif %}
+  </div>
+{% endblock %}
+
+{% block content %}
+    {% if tag != 'None' %}
+    <div class="ask-title ask-container">
+        <h2>Tag: {{ tag }}</h2>
+    </div>
+    {% endif %}
+    <div id="questions_list">
+          {% include "includes/questions.html" %}
+    </div>
+
+    {% include "includes/paginator.html" %}
+{% endblock %}

@@ -1,0 +1,39 @@
+{% for question in question_list %}
+<div class="ask-container ask-margin-top ask-no-padding">
+    <div class="media">
+        <div class="media-left ask-no-padding">
+            <div class="media-object">
+                <img class="ask-img-list" src="/css/abstract.jpeg"/>
+                <div class=" ask-question-form">
+                    <div class="input-group spinner">
+                        <input type="text" class="form-control" value="{{ question.get_rating }}">
+                        <div class="input-group-btn-vertical">
+                            <button class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
+                            <button class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="media-body ask-question-main">
+            <div class=" ask-question-inside-block">
+                <a href="{{ question.get_absolute_url }}">
+                    <h3 class="ask-media-heading">{{ question.title }}</h3>
+                </a>
+                <p>{{ question.content }}</p>
+
+            </div>
+            <div class="ask-question-inside-block ask-container-bottom">
+                <a href="{{ question.get_absolute_url }}">Answer ({{ question.get_answers_count }})</a>
+                <div class="ask-float-right">
+                    Tags:
+                    {% for tag in question.tags.all %}
+                        <a href="{% url 'ask:tag-list' tag.text %}">{{ tag.text }}</a>
+                    {% endfor %}
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}

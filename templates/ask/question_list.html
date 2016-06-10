@@ -1,0 +1,30 @@
+{% extends "ask/base.html" %}
+
+
+{% block nav_bar_component %}
+  <div class="navbar-form navbar-right">
+      {% if best %}
+        <button id="best" value="True" onclick="window.open('{% url 'ask:index' %}','_self')" class="btn btn-primary">Show best</button>
+      {% else %}
+        <button id="best" value="False" onclick="window.open('{% url 'ask:best-list' %}','_self')" class="btn btn-default">Show best</button>
+      {% endif %}
+  </div>
+{% endblock %}
+
+{% block content %}
+    {% if tag %}
+    <div class="ask-title ask-container">
+        <h2>Tag: {{ tag }}</h2>
+    </div>
+    {% endif %}
+    <div id="questions_list">
+      {% include "ask/includes/questions.html" %}
+    </div>
+
+    <div id="error" style="visibility: gone;"><h3>No more questions...</h3></div>
+
+{% endblock %}
+
+{% block js %}
+    <script src="/js/questions_list_ajax.js"></script>
+{% endblock %}

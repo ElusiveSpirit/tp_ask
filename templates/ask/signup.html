@@ -1,0 +1,53 @@
+{% extends "ask/base_short.html" %}
+
+{% block content %}
+<div class="col-md-6 col-md-offset-1">
+<!--<div class="page-header">-->
+<div class="ask-title ask-container">
+    <h2>Registration</h2>
+</div>
+<!--action="javascript:isCorrect(); void(0);"   -->
+<div class="ask-container ask-margin-top">
+    <form id="formLogIn" enctype="multipart/form-data" class="form-horizontal ask-margin-top" method="post">
+      {% csrf_token %}
+      {% for hidden in form.hidden_fields %}
+        {{ hidden }}
+      {% endfor %}
+
+      {% for e in form.non_field_errors %}
+        <div id="errorLabel" class="form-group">
+          <div class="col-sm-offset-3 col-sm-9 has-error">
+            <label class="control-label">{{ e }}</label>
+          </div>
+        </div>
+      {% endfor %}
+
+      {% for field in form.visible_fields %}
+        <div class="form-group {% if field.errors %}has-error{% endif %}">
+          {% if field.errors %}
+            <div id="{{ field.id_for_label }}_error_label">
+              <div class="col-sm-offset-3 col-sm-8">
+                {% for error in field.errors %}
+                  <label class="control-label" for="{{ field.id_for_label }}">{{ error }}</label>
+                {% endfor %}
+              </div>
+            </div>
+          {% endif %}
+          <label for="{{ field.id_for_label }}" class="col-sm-3 control-label">{{ field.label }}</label>
+          <div class="col-sm-9">
+            {{ field }}
+          </div>
+          {% if field.help_text %}
+            <p class="help">{{ field.help_text|safe }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+      <div class="form-group">
+        <div class="col-sm-offset-4 col-sm-7">
+          <button type="submit" class="btn btn-default ask-btn-big" >Register</button>
+        </div>
+      </div>
+    </form>
+</div>
+</div>
+{% endblock %}
