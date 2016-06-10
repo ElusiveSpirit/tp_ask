@@ -148,8 +148,13 @@ def signup(request):
     if request.method == 'POST':
         form = RegistrationForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            return redirect(form.get_url())
+            user = form.save()
+            if user.is_active:
+                login(request, user)
+                return redirect(form.get_url())
+            else:
+                # Something went wrong
+                pass
 
     else:
         form = RegistrationForm(initial={'url' : request.GET.get('next', '/')})

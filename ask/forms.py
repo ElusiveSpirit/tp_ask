@@ -74,13 +74,16 @@ class RegistrationForm(forms.Form):
         pass
 
     def save(self):
-        return Profile.objects.create_user(
+        user = Profile.objects.create_user(
             username=self.cleaned_data['username'],
             email=self.cleaned_data['email'],
             #nickname=self.cleaned_data['nickname'],
             password=self.cleaned_data['password'],
             avatar=self.cleaned_data['avatar']
         )
+        if (user):
+            return authenticate(username=self.cleaned_data['username'],
+                        password=self.cleaned_data['password'])
 
     def get_url(self):
         return self.cleaned_data['url']
