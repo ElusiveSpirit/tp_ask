@@ -11,6 +11,37 @@ class TestUpload(forms.Form):
     )
 
 
+class EditProfileForm(forms.Form):
+    label_suffix = ''
+    common_attrs = {'class' : 'form-control'}
+
+    username = forms.CharField(
+        label='Login', max_length=30,
+        widget=forms.TextInput(attrs=common_attrs))
+    email = forms.EmailField(
+        label='Email', max_length=30,
+        widget=forms.EmailInput(attrs=common_attrs))
+    nickname = forms.CharField(
+        label='Nickname', max_length=30,
+        widget=forms.TextInput(attrs=common_attrs))
+    avatar = forms.FileField(
+        required=False,
+        label='Avatar',
+        widget=forms.FileInput(attrs=common_attrs))
+
+    def clean_username(self):
+        username = self.cleaned_data['username']
+        if not re.match(r"^[A-Za-z0-9_-]{3,30}$", username):
+            raise forms.ValidationError('Username may contains only letters and decimals', code=9)
+        return username
+
+    def clean_nickname(self):
+        nickname = self.cleaned_data['nickname']
+        if not re.match(r"^[A-Za-z0-9_-]{3,30}$", nickname):
+            raise forms.ValidationError('Nickname may contains only letters and decimals', code=8)
+        return nickname
+
+
 class RegistrationForm(forms.Form):
     label_suffix = ''
     common_attrs = {'class' : 'form-control'}
@@ -77,7 +108,7 @@ class RegistrationForm(forms.Form):
         user = Profile.objects.create_user(
             username=self.cleaned_data['username'],
             email=self.cleaned_data['email'],
-            #nickname=self.cleaned_data['nickname'],
+            first_name=self.cleaned_data['nickname'],
             password=self.cleaned_data['password'],
             avatar=self.cleaned_data['avatar']
         )
@@ -90,7 +121,6 @@ class RegistrationForm(forms.Form):
 
 
 class AuthForm(forms.Form):
-    #required_css_class = 'form-control'
     label_suffix = ''
     common_attrs = {'class' : 'form-control'}
 
@@ -113,17 +143,14 @@ class AuthForm(forms.Form):
             #raise forms.ValidationError('Url to a different site', code=10)
         return url
 
-    def clean(self):
-        self.user = authenticate(username=self.cleaned_data['username'],
-                        password=self.cleaned_data['password'])
-        if self.user is None:
-            raise forms.ValidationError('Login or password incorrect', code=10)
-
-    def authenticate(self):
-        return self.user
-
     def get_url(self):
         return self.cleaned_data['url']
+
+
+class AddAnswerForm(forms.Form):
+    content = forms.CharField()
+    question_id = forms.IntegerField(
+        widget=forms.HiddenInput())
 
 
 class AddQuestionForm(forms.Form):

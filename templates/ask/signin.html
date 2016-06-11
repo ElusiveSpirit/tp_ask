@@ -16,13 +16,13 @@
                 {{ hidden }}
               {% endfor %}
 
-              {% for e in form.non_field_errors %}
+              {% if login_error %}
                 <div id="errorLabel" class="form-group">
                   <div class="col-sm-offset-3 col-sm-9 has-error">
-                    <label class="control-label">{{ e }}</label>
+                    <label class="control-label">Login or password incorrect</label>
                   </div>
                 </div>
-              {% endfor %}
+              {% endif %}
 
               {% for field in form.visible_fields %}
                 <div class="form-group ">

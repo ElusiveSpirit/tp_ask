@@ -5,13 +5,13 @@ from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect
 from django.core.paginator import Paginator
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
-from django.contrib.auth import login, logout
+from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
 from django.views import generic
 from django.conf import settings
 
 from ask.models import Tag, Profile, Question, Answer, Like
-from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm
+from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm, EditProfileForm, AddAnswerForm
 # Create your views here.
 from ask.models import TestUpload as Upload
 
@@ -75,17 +75,7 @@ def tag_list(request, tag):
         'question_list' : questions[0:10],
         'tag' : tag,
     })
-"""
-class TagListView(generic.DetailView):
-    context_object_name = 'question_list'
-    def get_queryset(self):
-        return Question.objects.by_tag(self.get_slug_field())[0:10]
 
-    def get_context_data(self, **kwargs):
-        context = super(HotListView, self).get_context_data(**kwargs)
-        context['tag'] = tag
-        return context
-"""
 
 class HotListView(generic.ListView):
     def get_queryset(self):
@@ -100,11 +90,7 @@ class HotListView(generic.ListView):
 class QuestionListView(generic.ListView):
     def get_queryset(self):
         return Question.objects.all()[0:10]
-"""
-class QuestionList(generic.ListView):
 
-    def get(self, request, *args, **kwargs):
-"""
 
 @require_GET
 def question_get_list(request):
@@ -136,6 +122,7 @@ def question_get_list(request):
     })
 
 
+@login_required
 def logout_view(request):
     logout(request)
     return redirect('/')
@@ -164,34 +151,84 @@ def signup(request):
 
 
 def signin(request):
-    error = ''
+    login_error = False
     if request.user.is_authenticated():
         return redirect('/')
     if request.method == 'POST':
         form = AuthForm(request.POST)
         if form.is_valid():
-            user = form.authenticate()
-            if user.is_active:
-                login(request, user)
-                return redirect(form.get_url())
-            else:
-                ...
-                # Return a 'disabled account' error message
-        #else:
-            # Return an 'invalid login' error message.
+            user = authenticate(username=form.cleaned_data['username'],
+                                password=form.cleaned_data['password'])
+            if user:
+                if user.is_active:
+                    login(request, user)
+                    return redirect(form.get_url())
+                else:
+                    # Return a 'disabled account' error message
+                    pass
+        # Return an 'invalid login' error message.
+        login_error = True
     else:
         form = AuthForm(initial={'url' : request.GET.get('next', '/')})
     return render(request, 'ask/signin.html',{
                 'form' : form,
+                'login_error' : login_error,
             })
 
 
 def question_details(request, pk):
     question = get_object_or_404(Question, id=pk)
+    anchor = None
+    if request.method == 'POST':
+        form = AddAnswerForm(request.POST)
+        if form.is_valid():
+            answer = Answer.objects.create(
+                content=form.cleaned_data['content'],
+                author=request.user,
+                question=question,
+            )
+            anchor = answer.get_anchor()
+    else:
+        form = AddAnswerForm()
+
     answers = Answer.objects.filter(question=question)
     return render(request, 'ask/question_detail.html', {
         'question' : question,
         'answer_list' : answers[:],
+        'answer_form' : form,
+        'anchor' : anchor,
+    })
+
+
+@login_required
+def profile_detail_edit(request):
+    has_changed = False
+    if request.method == 'POST':
+        form = EditProfileForm(request.POST, request.FILES)
+        if form.is_valid():
+            profile = request.user
+            if 'username' in form.changed_data:
+                profile.username = form.cleaned_data['username']
+            if 'email' in form.changed_data:
+                profile.email = form.cleaned_data['email']
+            if 'nickname' in form.changed_data:
+                profile.first_name = form.cleaned_data['nickname']
+            if 'avatar' in form.changed_data:
+                profile.avatar = form.cleaned_data['avatar']
+            if form.has_changed():
+                profile.save()
+                has_changed = True
+    else:
+        form = EditProfileForm(initial={
+            'username' : request.user.username,
+            'email' : request.user.email,
+            'nickname' : request.user.first_name,
+        })
+    return render(request, 'ask/profile_detail_edit.html', {
+        'form' : form,
+        # Does not work well
+        # form.has_changed(),
+        'saved' : has_changed
     })
 
 @login_required

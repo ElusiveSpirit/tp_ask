@@ -1,0 +1,32 @@
+<div id="{{ answer.get_anchor }}" class="ask-margin-top  ask-no-padding">
+    <div class="media">
+        <div class="media-left ask-no-padding">
+            <div class="media-object">
+                <img class="ask-container ask-no-padding ask-img-list ask-question-detail" src="/css/abstract.jpeg"/>
+                <div class=" ask-question-form-answer">
+                    <div class="input-group spinner">
+                        <input type="text" class="form-control" value="{{ answer.get_rating }}">
+                        <div class="input-group-btn-vertical">
+                            <button class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
+                            <button class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="media-body ask-question-inside-block">
+            <div class="ask-container">
+                <p>{{ answer.content }}</p>
+                <div class="caption">
+                    <form>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" value="true"> Correct!
+                            </label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

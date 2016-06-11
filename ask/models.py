@@ -6,7 +6,7 @@ from django.contrib.auth.models import User, UserManager
 
 class TestUpload(models.Model):
     docfile = models.FileField()
-    
+
     def get_avatar_url(self):
         url = self.docfile.url[1:]
         return 'uploads' + url
@@ -20,7 +20,7 @@ class Profile(User):
     objects = UserManager()
 
     def get_avatar_url(self):
-        return 'uploads/' + self.avatar.url
+        return '/uploads/' + self.avatar.url
 
     class Meta:
         db_table = 'ask_profiles'
@@ -86,7 +86,7 @@ class Answer(models.Model):
     question = models.ForeignKey(Question)
     author = models.ForeignKey(Profile)
     created_at = models.DateTimeField(blank=True, auto_now_add=True)
-    is_correct = models.BooleanField()
+    is_correct = models.BooleanField(default=False)
 
     def __str__(self):
         return self.content
@@ -94,9 +94,12 @@ class Answer(models.Model):
     def get_rating(self):
         return Like.objects.filter(answer=self).count()
 
+    def get_anchor(self):
+        return 'answer_' + str(self.pk)
+
     class Meta:
         db_table = 'ask_answers'
-        ordering = ['-created_at']
+        ordering = ['created_at']
 
 
 class Like(models.Model):
