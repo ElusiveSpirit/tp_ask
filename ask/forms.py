@@ -1,9 +1,11 @@
 import re
+import logging
 
 from django import forms
 from django.contrib.auth import authenticate
 from ask.models import Profile, Question, Tag, Like
 
+logger = logging.getLogger('ask.models.errors')
 
 class TestUpload(forms.Form):
     avatar = forms.FileField(
@@ -156,6 +158,7 @@ class AddLikeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.profile = kwargs.pop('profile', None)
+        self.user_like = None
         super(AddLikeForm, self).__init__(*args, **kwargs)
 
 
@@ -163,25 +166,48 @@ class AddLikeForm(forms.ModelForm):
         cleaned_data = super(AddLikeForm, self).clean()
         q_id = self.cleaned_data['q_id']
         try:
-            # TODO Проверка принадлежности вопроса
-            # Проверка на уже поставленный лайк
-            # Удаление лайка
             self.question = Question.objects.get(pk=q_id)
-            #if self.question.author.pk == self.profile.pk:
-            #    raise forms.ValidationError('question_error')
         except Question.DoesNotExist:
-            raise forms.ValidationError('question_error')
+            raise forms.ValidationError('Question does not exist')
+
+        try:
+            if self.question.author.pk == self.profile.pk:
+                raise forms.ValidationError('Current user is question\'s author')
+        except Profile.DoesNotExist:
+            raise forms.ValidationError('Author does not exist')
+
+        user_like = self.question.likes.filter(profile=self.profile)
+        if user_like:
+            if len(user_like) > 1:
+                logger.error('Wrong likes: profile.pk=' + self.profile.pk + ', question.pk=' + self.question.pk)
+                raise forms.ValidationError('Unexpected error')
+            self.user_like = user_like[0]
+            # if user liked it and now dislike
+            # if user disliked it and now like
+            if (self.user_like.like and self.cleaned_data['like'] or
+                    not self.user_like.like and not self.cleaned_data['like']):
+                raise forms.ValidationError('User is already liked or disliked it')
         return cleaned_data
 
     def save(self, commit=True):
-        print('save')
         obj = super(AddLikeForm, self).save(commit=False)
         obj.profile = self.profile
-        if commit:
+        if self.user_like:
+            self.question.likes.remove(self.user_like)
+            self.user_like.delete()
+            self.result = 0
+        elif commit:
             obj.save()
             self.question.likes.add(obj)
             self.question.save()
+            if obj.like:
+                self.result = 1
+            else:
+                self.result = -1;
         return obj
+
+    def get_result(self):
+        return self.result
 
 
 class AddAnswerForm(forms.Form):

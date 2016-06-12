@@ -74,9 +74,7 @@ class Question(models.Model):
     content = models.TextField()
     author = models.ForeignKey(Profile)
     created_at = models.DateTimeField(blank = True, auto_now_add=True)
-    #rating = models.IntegerField(blank=True, default=0)
-    #answers_count = models.IntegerField(blank=True, default=0)
-    tags = models.ManyToManyField(Tag)
+    tags = models.ManyToManyField(Tag, blank=True)
     likes = models.ManyToManyField(Like, blank=True)
 
     objects = QuestionManager()

@@ -25,11 +25,13 @@ function likeQ(button, q_id, like) {
     }).success(function(data) {
         console.log('http ' + data.status + ' ' + data.message);
         if (data.status == 'ok') {
-            button.setAttribute("disabled", "");
-            if (like == 1) {
+           if (data.vote != 0) {
+               button.setAttribute("disabled", "");
+           }
+           if (like == 1) {
                 button.nextElementSibling.removeAttribute("disabled");
             } else {
-                button.previousElementSibling.removeAttribute("disabled");;
+                button.previousElementSibling.removeAttribute("disabled");
             }
             var input = button.parentNode.previousElementSibling;
             input.setAttribute("value", data.likes);

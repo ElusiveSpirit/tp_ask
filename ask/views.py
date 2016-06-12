@@ -200,6 +200,7 @@ def like_question(request):
     if form.is_valid():
         form.save()
         return HttpResponseAjax(
+            vote = form.get_result(), 
             likes = form.question.get_rating()
         )
     else:
