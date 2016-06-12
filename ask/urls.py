@@ -3,8 +3,6 @@ from django.conf.urls import url
 from ask import views as ask_views
 
 urlpatterns = [
-    url(r'^upload/', ask_views.upload, name='upload'),
-
     # private urls
     url(r'^ask/', ask_views.ask, name='ask'),
     url(r'^profile/edit/', ask_views.profile_detail_edit, name='profile-detail-edit'),

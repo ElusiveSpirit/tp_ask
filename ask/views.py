@@ -1,4 +1,5 @@
 import datetime
+import json
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
@@ -15,26 +16,8 @@ from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm, E
 # Create your views here.
 from ask.models import TestUpload as Upload
 
-def upload(request):
-    if request.method == 'POST':
-        form = TestUpload(request.POST, request.FILES)
-        if form.is_valid():
-            newdoc = Upload(docfile = request.FILES['avatar'])
-            newdoc.save()
-            # Redirect to the document list after POST
-            #return HttpResponseRedirect(reverse('myproject.myapp.views.list'))
-    else:
-        form = TestUpload() # A empty, unbound form
-        newdoc = None
 
-
-    # Render list page with the documents and the form
-    return render(request,
-        'ask/test_upload.html',
-        {'pic': newdoc, 'form': form},
-        #context_instance=RequestContext(request)
-    )
-
+# A paginator func for any objects lists
 def get_paginator(objects, page, limit):
     try:
         limit = int(limit)
@@ -94,12 +77,14 @@ class QuestionListView(generic.ListView):
 
 @require_GET
 def question_get_list(request):
+    """
+    A function for ajax requests for progressive loader
+    """
     since = request.GET.get('since', 0)
     tag = request.GET.get("tag", "None")
     if tag == "":
         tag = "None"
     best = request.GET.get("best", "None")
-
 
     if tag != "None" and best == "True":
         one_year_ago = datetime.datetime.now() - datetime.timedelta(days=100)
@@ -142,7 +127,6 @@ def signup(request):
             else:
                 # Something went wrong
                 pass
-
     else:
         form = RegistrationForm(initial={'url' : request.GET.get('next', '/')})
     return render(request, 'ask/signup.html',{
@@ -176,7 +160,24 @@ def signin(request):
             })
 
 
+def like(request):
+    try:
+        question = Question.objects.get(request.POST.get('q_id'))
+        Like.objects.create(user=request.user, question=question)
+        return HttpResponse(json.dumps({
+            'status' : 'ok',
+            'likes' : len(question.vote_set),
+        }), content_type='apllication/json')
+    except:
+        return HttpResponse(json.dumps({
+            'status' : 'error',
+        }), content_type='apllication/json')
+
+
 def question_details(request, pk):
+    """
+        Here's also code for answers. Move it to another page later.
+    """
     question = get_object_or_404(Question, id=pk)
     anchor = None
     if request.method == 'POST':

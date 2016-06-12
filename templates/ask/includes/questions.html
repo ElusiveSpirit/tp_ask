@@ -6,10 +6,21 @@
                 <img class="ask-img-list" src="/css/abstract.jpeg"/>
                 <div class=" ask-question-form">
                     <div class="input-group spinner">
-                        <input type="text" class="form-control" value="{{ question.get_rating }}">
+                        <input type="text" disabled="true" class="form-control" value="{{ question.get_rating }}">
                         <div class="input-group-btn-vertical">
-                            <button class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
-                            <button class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
+                          {% if request.user.pk != question.author.pk %}
+                            <button {% if request.user.pk in question.get_likes_authors_pk %}disabled="true"{% endif %}
+                                class="btn btn-default" type="button">
+                                <i class="fa fa-caret-up"></i>
+                            </button>
+                            <button {% if request.user.pk in question.get_dislikes_authors_pk %}disabled="true"{% endif %}
+                                class="btn btn-default" type="button">
+                              <i class="fa fa-caret-down"></i>
+                            </button>
+                          {% else %}
+                            <button disabled="true" class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
+                            <button disabled="true" class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
+                          {% endif %}
                         </div>
                     </div>
                 </div>
