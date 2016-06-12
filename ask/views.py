@@ -12,7 +12,7 @@ from django.views import generic
 from django.conf import settings
 
 from ask.models import Tag, Profile, Question, Answer, Like
-from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm, EditProfileForm, AddAnswerForm
+from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm, EditProfileForm, AddAnswerForm, AddLikeForm
 # Create your views here.
 from ask.models import TestUpload as Upload
 
@@ -160,18 +160,55 @@ def signin(request):
             })
 
 
-def like(request):
-    try:
-        question = Question.objects.get(request.POST.get('q_id'))
-        Like.objects.create(user=request.user, question=question)
-        return HttpResponse(json.dumps({
-            'status' : 'ok',
-            'likes' : len(question.vote_set),
-        }), content_type='apllication/json')
-    except:
-        return HttpResponse(json.dumps({
-            'status' : 'error',
-        }), content_type='apllication/json')
+class HttpResponseAjax(HttpResponse):
+    def __init__(self, status='ok', **kwargs):
+        kwargs['status'] = status
+        super(HttpResponseAjax, self).__init__(
+            content = json.dumps(kwargs),
+            content_type = 'application/json',
+        )
+
+
+class HttpResponseAjaxError(HttpResponseAjax):
+    def __init__(self, code, message):
+        super(HttpResponseAjaxError, self).__init__(
+            status = 'error', code = code, message = message
+        )
+
+
+def login_required_ajax(view):
+    def view2(request, *args, **kwargs):
+        if request.user.is_authenticated():
+            return view(request, *args, **kwargs)
+        elif request.is_ajax():
+            return HttpResponseAjaxError(
+                code = "no_auth",
+                message = u'Требуется авторизация',
+            )
+        else:
+            redirect('/login/?continue=' + request.get_full_path())
+    return view2
+
+
+@login_required_ajax
+def like_question(request):
+    if not request.is_ajax():
+        redirect(reverse('index'))
+    message = u'Unexpected error',
+    #try:
+    form = AddLikeForm(request.POST, profile=request.user)
+    if form.is_valid():
+        form.save()
+        return HttpResponseAjax(
+            likes = form.question.get_rating()
+        )
+    else:
+        message = 'Invalid params'
+#except:
+    return HttpResponseAjaxError(
+        code = 'like_error',
+        message = message,
+    )
 
 
 def question_details(request, pk):
@@ -233,7 +270,7 @@ def profile_detail_edit(request):
     })
 
 @login_required
-def ask(request):
+def add_question(request):
     if request.method == 'POST':
         form = AddQuestionForm(request.POST)
         if form.is_valid():

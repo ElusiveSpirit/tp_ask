@@ -2,7 +2,7 @@ import re
 
 from django import forms
 from django.contrib.auth import authenticate
-from ask.models import Profile, Question, Tag
+from ask.models import Profile, Question, Tag, Like
 
 
 class TestUpload(forms.Form):
@@ -145,6 +145,43 @@ class AuthForm(forms.Form):
 
     def get_url(self):
         return self.cleaned_data['url']
+
+
+class AddLikeForm(forms.ModelForm):
+    q_id = forms.IntegerField()
+
+    class Meta:
+        model = Like
+        fields = ['like']
+
+    def __init__(self, *args, **kwargs):
+        self.profile = kwargs.pop('profile', None)
+        super(AddLikeForm, self).__init__(*args, **kwargs)
+
+
+    def clean(self):
+        cleaned_data = super(AddLikeForm, self).clean()
+        q_id = self.cleaned_data['q_id']
+        try:
+            # TODO Проверка принадлежности вопроса
+            # Проверка на уже поставленный лайк
+            # Удаление лайка
+            self.question = Question.objects.get(pk=q_id)
+            #if self.question.author.pk == self.profile.pk:
+            #    raise forms.ValidationError('question_error')
+        except Question.DoesNotExist:
+            raise forms.ValidationError('question_error')
+        return cleaned_data
+
+    def save(self, commit=True):
+        print('save')
+        obj = super(AddLikeForm, self).save(commit=False)
+        obj.profile = self.profile
+        if commit:
+            obj.save()
+            self.question.likes.add(obj)
+            self.question.save()
+        return obj
 
 
 class AddAnswerForm(forms.Form):

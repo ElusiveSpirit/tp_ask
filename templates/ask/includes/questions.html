@@ -9,12 +9,12 @@
                         <input type="text" disabled="true" class="form-control" value="{{ question.get_rating }}">
                         <div class="input-group-btn-vertical">
                           {% if request.user.pk != question.author.pk %}
-                            <button {% if request.user.pk in question.get_likes_authors_pk %}disabled="true"{% endif %}
-                                class="btn btn-default" type="button">
+                            <button {% if request.user.pk in question.get_likes_authors_pk %}disabled{% endif %}
+                                class="btn btn-default" type="button" onclick="likeQ(this, {{ question.pk }}, true)">
                                 <i class="fa fa-caret-up"></i>
                             </button>
-                            <button {% if request.user.pk in question.get_dislikes_authors_pk %}disabled="true"{% endif %}
-                                class="btn btn-default" type="button">
+                            <button {% if request.user.pk in question.get_dislikes_authors_pk %}disabled{% endif %}
+                                class="btn btn-default" type="button"  onclick="likeQ(this, {{ question.pk }}, false)">
                               <i class="fa fa-caret-down"></i>
                             </button>
                           {% else %}

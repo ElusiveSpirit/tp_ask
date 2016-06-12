@@ -4,8 +4,9 @@ from ask import views as ask_views
 
 urlpatterns = [
     # private urls
-    url(r'^ask/', ask_views.ask, name='ask'),
+    url(r'^ask/', ask_views.add_question, name='ask'),
     url(r'^profile/edit/', ask_views.profile_detail_edit, name='profile-detail-edit'),
+    url(r'^like_question/', ask_views.like_question, name='like-question'),
 
     # auth urls
     url(r'^logout/', ask_views.logout_view, name='logout'),
