@@ -4,16 +4,17 @@ import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
+from django.core.urlresolvers import reverse
+from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST, require_GET
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.decorators import login_required
-from django.views import generic
 from django.conf import settings
 
 from ask.models import Tag, Profile, Question, Answer, Like
-from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm, EditProfileForm, AddAnswerForm, AddLikeForm, CorrectAnswerForm
-# Create your views here.
+from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm
+from ask.forms import EditProfileForm, AddAnswerForm, AddLikeForm, CorrectAnswerForm
 from ask.models import TestUpload as Upload
 
 
@@ -193,10 +194,11 @@ def login_required_ajax(view):
 @login_required_ajax
 def correct_answer(request):
     if not request.is_ajax():
-        redirect(reverse('index'))
+        redirect(reverse('ask:index'))
 
     answer = get_object_or_404(Answer, id=int(request.POST.get('pk')))
-    form = CorrectAnswerForm(request.POST, profile=request.user, instance=answer)
+    question = get_object_or_404(Question, id=int(request.POST.get('q_pk')))
+    form = CorrectAnswerForm(request.POST, profile=request.user, question=question, instance=answer)
     if form.is_valid():
         form.save()
         return HttpResponseAjax(status='ok')
@@ -210,7 +212,7 @@ def correct_answer(request):
 @login_required_ajax
 def like_obj(request, obj):
     if not request.is_ajax():
-        redirect(reverse('index'))
+        redirect(reverse('ask:index'))
     message = u'Unexpected error',
 
     if obj == 'question':
@@ -235,30 +237,32 @@ def like_obj(request, obj):
     )
 
 
-def question_details(request, pk):
-    """
-        Here's also code for answers. Move it to another page later.
-    """
-    question = get_object_or_404(Question, id=pk)
-    anchor = None
-    if request.method == 'POST':
-        form = AddAnswerForm(request.POST)
-        if form.is_valid():
-            answer = Answer.objects.create(
-                content=form.cleaned_data['content'],
-                author=request.user,
-                question=question,
-            )
-            anchor = answer.get_anchor()
-    else:
-        form = AddAnswerForm()
+@login_required
+def add_answer(request):
+    if not request.POST:
+        return redirect(reverse('ask:index'))
+    form = AddAnswerForm(request.POST)
+    if form.is_valid():
+        question = get_object_or_404(Question, id=form.cleaned_data['question_id'])
+        answer = Answer.objects.create(
+            content=form.cleaned_data['content'],
+            author=request.user,
+            question=question
+        )
+        anchor = answer.get_anchor()
+        return redirect(question.get_url_with_answer_anchor(anchor))
+    try:
+        return redirect(reverse('ask:question-detail', pk=request.POST.get('question_id')))
+    except:
+        redirect(reverse('ask:index'))
 
+
+def question_details(request, pk):
+    question = get_object_or_404(Question, id=pk)
     answers = Answer.objects.filter(question=question)
     return render(request, 'ask/question_detail.html', {
         'question' : question,
         'answer_list' : answers[:],
-        'answer_form' : form,
-        'anchor' : anchor,
     })
 
 

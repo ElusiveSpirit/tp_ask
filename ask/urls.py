@@ -6,6 +6,7 @@ urlpatterns = [
     # private urls
     url(r'^ask/', ask_views.add_question, name='ask'),
     url(r'^profile/edit/', ask_views.profile_detail_edit, name='profile-detail-edit'),
+    url(r'^add_answer/', ask_views.add_answer, name='add-answer'),
     # ajax private
     url(r'^like_question/', ask_views.like_obj, {'obj' : 'question'}, name='like-question'),
     url(r'^like_answer/', ask_views.like_obj, {'obj' : 'answer'}, name='like-question'),
@@ -21,6 +22,6 @@ urlpatterns = [
     url(r'^get_questions_list/*', ask_views.question_get_list, name='questions-get-list'),
     url(r'^hot/', ask_views.HotListView.as_view(), name='best-list'),
     url(r'^tag/(?P<tag>[A-z0-9_-]+)/$', ask_views.tag_list, name='tag-list'),
-    url(r'^question/(?P<pk>\d+)/(#\d+)?$', ask_views.question_details, name='question-details'),
+    url(r'^question/(?P<pk>\d+)/(#\d+)?$', ask_views.question_details, name='question-detail'),
     url(r'^', ask_views.QuestionListView.as_view(), name='index'),
 ]

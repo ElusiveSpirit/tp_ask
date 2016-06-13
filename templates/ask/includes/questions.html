@@ -12,7 +12,11 @@
         <div class="media-body ask-question-main">
             <div class=" ask-question-inside-block">
                 <a href="{{ question.get_absolute_url }}">
-                    <h3 class="ask-media-heading">{{ question.title }}</h3>
+                    <h3 class="ask-media-heading">{{ question.title }}
+                      {% if question.has_correct_answer %}
+                        <span class="ask-correct-asnwer">Has answer!</span>
+                      {% endif %}
+                    </h3>
                 </a>
                 <p>{{ question.content }}</p>
 

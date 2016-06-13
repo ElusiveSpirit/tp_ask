@@ -25,35 +25,26 @@
       {% include "ask/includes/answer.html" %}
     {% endfor %}
     <div class="ask-margin-top ask-no-padding">
-    <form method="POST"  action="{{ request.path }}">
-      {% csrf_token %}
-      <input type="hidden" name="question_id" value="{{ question.pk }}"/>
-      <div class="form-group">
-        <textarea name="content" class="form-control ask-not-resizable" rows="7" id="id_content" ></textarea>
-      </div>
-      <div class="form-group ask-float-right">
-        <button type="submit" class="btn btn-default ask-btn-big">Answer!</button>
-      </div>
-    </form>
+    {% if request.user.is_authenticated %}
+      <form method="POST"  action="{% url "ask:add-answer" %}">
+        {% csrf_token %}
+        <input type="hidden" name="question_id" value="{{ question.pk }}"/>
+        <div class="form-group">
+          <textarea name="content" class="form-control ask-not-resizable" rows="7" id="id_content" ></textarea>
+        </div>
+        <div class="form-group ask-float-right">
+          <button type="submit" class="btn btn-default ask-btn-big">Answer!</button>
+        </div>
+      </form>
+    {% else %}
+      <h4>To add your answer you should
+        <a href="{% url 'ask:signin' %}?next={{ request.path }}">login</a> or
+        <a href="{% url 'ask:signup' %}?next={{ request.path }}">Register</a>
+      </h4>
+    {% endif %}
     </div>
   </div>
 </div>
     <!-- end-container-main -->
 
-{% endblock %}
-
-{% block js %}
-  {% if anchor %}
-    <script>
-      $( document ).ready(function() {
-          var offset = $('#{{ anchor }}').offset();
-          offset.left -= 20;
-          offset.top -= 20;
-          $('html, body').animate({
-              scrollTop: offset.top,
-              scrollLeft: offset.left
-          });
-      });
-    </script>
-  {% endif %}
 {% endblock %}

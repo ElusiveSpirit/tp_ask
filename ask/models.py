@@ -1,4 +1,5 @@
 import datetime
+from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User, UserManager
 # Create your models here.
@@ -61,7 +62,7 @@ class LikedMethods():
             authors.append(like.profile.pk)
         return authors
 
-    def get_who_like_pk(self):
+    def get_who_dislike_pk(self):
         authors = []
         for dislike in self.likes.filter(like=False):
             authors.append(dislike.profile.pk)
@@ -97,8 +98,15 @@ class Question(models.Model, LikedMethods):
     def get_answers_count(self):
         return Answer.objects.filter(question=self).count()
 
+    def has_correct_answer(self):
+        return Answer.objects.filter(question=self, is_correct=True).count() > 0
+
+    def get_url_with_answer_anchor(self, anchor):
+        return self.get_absolute_url() + '#' + str(anchor)
+
     def get_absolute_url(self):
-        return '/question/%d/' % self.pk
+        return reverse('ask:question-detail', kwargs={'pk' : self.pk})
+        #return '/question/%d/' % self.pk
 
     class Meta:
         db_table = 'ask_questions'

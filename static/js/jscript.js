@@ -45,13 +45,14 @@ function like(button, obj_id, like, type) {
     });
 }
 
-function correctAnswer(checkbox, id) {
+function correctAnswer(checkbox, id, q_id) {
   checkbox.setAttribute("checked", !checkbox.checked);
     $.ajax({
         url:  '/correct_answer/',
         type: 'POST',
         data: {
             'pk' : id,
+            'q_pk' : q_id,
             'is_correct' : checkbox.checked,
             'csrfmiddlewaretoken' : getCookie('csrftoken')
         },

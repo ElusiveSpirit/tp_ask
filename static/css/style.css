@@ -1,3 +1,9 @@
+h3 span.ask-correct-asnwer {
+    float: right;
+    font-size: smaller;
+    color: #3c763d;
+}
+
 .ask-log {
     display:inline-block;
     vertical-align:middle;

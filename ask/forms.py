@@ -156,11 +156,15 @@ class CorrectAnswerForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.profile = kwargs.pop('profile', None)
+        self.question = kwargs.pop('question', None)
         super(CorrectAnswerForm, self).__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super(CorrectAnswerForm, self).clean()
-        if self.instance.author.pk != self.profile.pk:
+        if self.instance.question != self.question:
+            raise forms.ValidationError("Wrong question and answer")
+
+        if self.question.author.pk != self.profile.pk:
             raise forms.ValidationError("User is not owner")
 
 
