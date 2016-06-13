@@ -11,24 +11,28 @@
   });
 })(jQuery);
 */
-function likeQ(button, q_id, like) {
-    // TODO Ajax request
-
+function like(button, obj_id, like, type) {
+  var url;
+  if (type == 'question') {
+    url = '/like_question/';
+  } else {
+    url = '/like_answer/';
+  }
     $.ajax({
-        url:  '/like_question/',
+        url:  url,
         type: 'POST',
         data: {
-            'q_id' : q_id,
+            'obj_id' : obj_id,
             'like' : like,
             'csrfmiddlewaretoken' : getCookie('csrftoken')
         },
     }).success(function(data) {
         console.log('http ' + data.status + ' ' + data.message);
         if (data.status == 'ok') {
-           if (data.vote != 0) {
+            if (data.vote != 0) {
                button.setAttribute("disabled", "");
-           }
-           if (like == 1) {
+            }
+            if (like == 1) {
                 button.nextElementSibling.removeAttribute("disabled");
             } else {
                 button.previousElementSibling.removeAttribute("disabled");
@@ -39,10 +43,6 @@ function likeQ(button, q_id, like) {
     }).error(function() {
         console.log('http error');
     });
-}
-
-function likeA(a_id, like) {
-    // TODO Ajax request
 }
 
 function getCookie(name) {

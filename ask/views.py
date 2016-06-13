@@ -191,21 +191,27 @@ def login_required_ajax(view):
 
 
 @login_required_ajax
-def like_question(request):
+def like_obj(request, obj):
     if not request.is_ajax():
         redirect(reverse('index'))
     message = u'Unexpected error',
-    #try:
-    form = AddLikeForm(request.POST, profile=request.user)
+
+    if obj == 'question':
+        obj = Question
+    elif obj == 'answer':
+        obj = Answer
+    else:
+        message = u'Type error',
+
+    form = AddLikeForm(request.POST, profile=request.user, obj=obj)
     if form.is_valid():
         form.save()
         return HttpResponseAjax(
-            vote = form.get_result(), 
-            likes = form.question.get_rating()
+            vote = form.get_result(),
+            likes = form.obj.get_rating()
         )
     else:
         message = 'Invalid params'
-#except:
     return HttpResponseAjaxError(
         code = 'like_error',
         message = message,

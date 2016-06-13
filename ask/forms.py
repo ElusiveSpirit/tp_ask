@@ -150,7 +150,7 @@ class AuthForm(forms.Form):
 
 
 class AddLikeForm(forms.ModelForm):
-    q_id = forms.IntegerField()
+    obj_id = forms.IntegerField()
 
     class Meta:
         model = Like
@@ -158,28 +158,29 @@ class AddLikeForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.profile = kwargs.pop('profile', None)
+        self.obj = kwargs.pop('obj', None)
         self.user_like = None
         super(AddLikeForm, self).__init__(*args, **kwargs)
 
 
     def clean(self):
         cleaned_data = super(AddLikeForm, self).clean()
-        q_id = self.cleaned_data['q_id']
+        obj_id = self.cleaned_data['obj_id']
         try:
-            self.question = Question.objects.get(pk=q_id)
-        except Question.DoesNotExist:
-            raise forms.ValidationError('Question does not exist')
+            self.obj = self.obj.objects.get(pk=obj_id)
+        except self.obj.DoesNotExist:
+            raise forms.ValidationError(str(self.obj) + ' does not exist')
 
         try:
-            if self.question.author.pk == self.profile.pk:
+            if self.obj.author.pk == self.profile.pk:
                 raise forms.ValidationError('Current user is question\'s author')
         except Profile.DoesNotExist:
             raise forms.ValidationError('Author does not exist')
 
-        user_like = self.question.likes.filter(profile=self.profile)
+        user_like = self.obj.likes.filter(profile=self.profile)
         if user_like:
             if len(user_like) > 1:
-                logger.error('Wrong likes: profile.pk=' + self.profile.pk + ', question.pk=' + self.question.pk)
+                logger.error('Wrong likes: profile.pk=' + self.profile.pk + ', obj.pk=' + self.obj.pk)
                 raise forms.ValidationError('Unexpected error')
             self.user_like = user_like[0]
             # if user liked it and now dislike
@@ -193,13 +194,13 @@ class AddLikeForm(forms.ModelForm):
         obj = super(AddLikeForm, self).save(commit=False)
         obj.profile = self.profile
         if self.user_like:
-            self.question.likes.remove(self.user_like)
+            self.obj.likes.remove(self.user_like)
             self.user_like.delete()
             self.result = 0
         elif commit:
             obj.save()
-            self.question.likes.add(obj)
-            self.question.save()
+            self.obj.likes.add(obj)
+            self.obj.save()
             if obj.like:
                 self.result = 1
             else:

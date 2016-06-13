@@ -6,7 +6,8 @@ urlpatterns = [
     # private urls
     url(r'^ask/', ask_views.add_question, name='ask'),
     url(r'^profile/edit/', ask_views.profile_detail_edit, name='profile-detail-edit'),
-    url(r'^like_question/', ask_views.like_question, name='like-question'),
+    url(r'^like_question/', ask_views.like_obj, {'obj' : 'question'}, name='like-question'),
+    url(r'^like_answer/', ask_views.like_obj, {'obj' : 'answer'}, name='like-question'),
 
     # auth urls
     url(r'^logout/', ask_views.logout_view, name='logout'),

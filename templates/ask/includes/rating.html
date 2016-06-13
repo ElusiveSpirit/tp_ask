@@ -1,0 +1,18 @@
+<div class="input-group spinner">
+    <input type="text" disabled="true" class="form-control" value="{{ object.get_rating }}">
+    <div class="input-group-btn-vertical">
+      {% if request.user.pk != object.author.pk %}
+        <button {% if request.user.pk in object.get_who_like_pk %}disabled{% endif %}
+            class="btn btn-default" type="button" onclick="like(this, {{ object.pk }}, true, '{{ type }}')">
+            <i class="fa fa-caret-up"></i>
+        </button>
+        <button {% if request.user.pk in object.get_who_dislike_pk %}disabled{% endif %}
+            class="btn btn-default" type="button"  onclick="like(this, {{ object.pk }}, false, '{{ type }}')">
+          <i class="fa fa-caret-down"></i>
+        </button>
+      {% else %}
+        <button disabled="true" class="btn btn-default" type="button"><i class="fa fa-caret-up"></i></button>
+        <button disabled="true" class="btn btn-default" type="button"><i class="fa fa-caret-down"></i></button>
+      {% endif %}
+    </div>
+</div>

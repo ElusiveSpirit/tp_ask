@@ -32,14 +32,9 @@ class Like(models.Model):
 
     profile = models.ForeignKey(Profile)
     like = models.BooleanField()
-    #question = models.ForeignKey(Question, null=True)
-    #answer = models.ForeignKey(Answer, null=True)
-    #rating = models.IntegerField(blank=True, default=0)
     created_at = models.DateTimeField(blank=True, auto_now_add=True)
 
-
     def __str__(self):
-        # return str(self.like)
         return (self.profile.username + ' = ' + str(self.like)
                     + " at " + str(self.created_at))
 
@@ -53,6 +48,24 @@ class Tag(models.Model):
     class Meta:
         db_table = 'ask_tags'
 
+
+class LikedMethods():
+    likes = None
+
+    def get_rating(self):
+        return self.likes.filter(like=True).count() - self.likes.filter(like=False).count()
+
+    def get_who_like_pk(self):
+        authors = []
+        for like in self.likes.filter(like=True):
+            authors.append(like.profile.pk)
+        return authors
+
+    def get_who_like_pk(self):
+        authors = []
+        for dislike in self.likes.filter(like=False):
+            authors.append(dislike.profile.pk)
+        return authors
 
 class QuestionManager(models.Manager):
     def best(self):
@@ -68,11 +81,10 @@ class QuestionManager(models.Manager):
         return self.filter(tags__in=tag)
 
 
-class Question(models.Model):
-
+class Question(models.Model, LikedMethods):
+    author = models.ForeignKey(Profile)
     title = models.CharField(max_length=128)
     content = models.TextField()
-    author = models.ForeignKey(Profile)
     created_at = models.DateTimeField(blank = True, auto_now_add=True)
     tags = models.ManyToManyField(Tag, blank=True)
     likes = models.ManyToManyField(Like, blank=True)
@@ -82,37 +94,21 @@ class Question(models.Model):
     def __str__(self):
         return self.title
 
-    def get_rating(self):
-        return self.likes.filter(like=True).count() - self.likes.filter(like=False).count()
-
     def get_answers_count(self):
         return Answer.objects.filter(question=self).count()
 
     def get_absolute_url(self):
         return '/question/%d/' % self.pk
 
-    def get_likes_authors_pk(self):
-        authors = []
-        for like in self.likes.filter(like=True):
-            authors.append(like.profile.pk)
-        return authors
-
-    def get_dislikes_authors_pk(self):
-        authors = []
-        for dislike in self.likes.filter(like=False):
-            authors.append(dislike.profile.pk)
-        return authors
-
     class Meta:
         db_table = 'ask_questions'
         ordering = ['-created_at']
 
 
-class Answer(models.Model):
-
+class Answer(models.Model, LikedMethods):
+    author = models.ForeignKey(Profile)
     content = models.TextField()
     question = models.ForeignKey(Question)
-    author = models.ForeignKey(Profile)
     created_at = models.DateTimeField(blank=True, auto_now_add=True)
     is_correct = models.BooleanField(default=False)
     likes = models.ManyToManyField(Like, blank=True)
@@ -120,12 +116,31 @@ class Answer(models.Model):
     def __str__(self):
         return self.content
 
-    def get_rating(self):
-        return Like.objects.filter(answer=self).count()
-
     def get_anchor(self):
         return 'answer_' + str(self.pk)
 
     class Meta:
         db_table = 'ask_answers'
         ordering = ['created_at']
+
+
+# Not needed
+class LikesField(models.ManyToManyField):
+
+    def __init__(self, *args, **kwargs):
+        super(LikesField, self).__init__(*args, **kwargs)
+
+    def get_rating(self):
+        return self.likes.filter(like=True).count() - self.likes.filter(like=False).count()
+
+    def get_who_like_pk(self):
+        authors = []
+        for like in self.likes.filter(like=True):
+            authors.append(like.profile.pk)
+        return authors
+
+    def get_who_like_pk(self):
+        authors = []
+        for dislike in self.likes.filter(like=False):
+            authors.append(dislike.profile.pk)
+        return authors
