@@ -45,6 +45,24 @@ function like(button, obj_id, like, type) {
     });
 }
 
+function correctAnswer(checkbox, id) {
+  checkbox.setAttribute("checked", !checkbox.checked);
+    $.ajax({
+        url:  '/correct_answer/',
+        type: 'POST',
+        data: {
+            'pk' : id,
+            'is_correct' : checkbox.checked,
+            'csrfmiddlewaretoken' : getCookie('csrftoken')
+        },
+    }).success(function(data) {
+        console.log('http ' + data.status + ' ' + data.message);
+        checkbox.setAttribute("checked", checkbox.checked);
+    }).error(function() {
+        console.log('http error');
+    });
+}
+
 function getCookie(name) {
     var cookieValue = null;
     if (document.cookie && document.cookie != '') {

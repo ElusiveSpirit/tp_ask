@@ -3,7 +3,7 @@ import logging
 
 from django import forms
 from django.contrib.auth import authenticate
-from ask.models import Profile, Question, Tag, Like
+from ask.models import Profile, Question, Tag, Like, Answer
 
 logger = logging.getLogger('ask.models.errors')
 
@@ -147,6 +147,21 @@ class AuthForm(forms.Form):
 
     def get_url(self):
         return self.cleaned_data['url']
+
+
+class CorrectAnswerForm(forms.ModelForm):
+    class Meta:
+        model = Answer
+        fields = ['is_correct']
+
+    def __init__(self, *args, **kwargs):
+        self.profile = kwargs.pop('profile', None)
+        super(CorrectAnswerForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super(CorrectAnswerForm, self).clean()
+        if self.instance.author.pk != self.profile.pk:
+            raise forms.ValidationError("User is not owner")
 
 
 class AddLikeForm(forms.ModelForm):

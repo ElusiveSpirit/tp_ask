@@ -12,7 +12,7 @@ from django.views import generic
 from django.conf import settings
 
 from ask.models import Tag, Profile, Question, Answer, Like
-from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm, EditProfileForm, AddAnswerForm, AddLikeForm
+from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm, EditProfileForm, AddAnswerForm, AddLikeForm, CorrectAnswerForm
 # Create your views here.
 from ask.models import TestUpload as Upload
 
@@ -188,6 +188,23 @@ def login_required_ajax(view):
         else:
             redirect('/login/?continue=' + request.get_full_path())
     return view2
+
+
+@login_required_ajax
+def correct_answer(request):
+    if not request.is_ajax():
+        redirect(reverse('index'))
+
+    answer = get_object_or_404(Answer, id=int(request.POST.get('pk')))
+    form = CorrectAnswerForm(request.POST, profile=request.user, instance=answer)
+    if form.is_valid():
+        form.save()
+        return HttpResponseAjax(status='ok')
+    else:
+        return HttpResponseAjaxError(
+            code = 'like_error',
+            message = 'Invalid params',
+        )
 
 
 @login_required_ajax
