@@ -58,6 +58,13 @@
           <button type="submit" class="btn btn-default">Find</button>
         </form>
 
+        <div class="navbar-form navbar-right">
+              <button onclick="window.open('{% url 'ask:ask' %}','_self')" class="btn btn-primary">Ask now!</button>
+            {% comment %}
+              <button id="best" value="False" onclick="window.open('{% url 'ask:best-list' %}','_self')" class="btn btn-default">Show best</button>
+            {% endcomment %}
+        </div>
+
         {% block nav_bar_component %}{% endblock %}
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->

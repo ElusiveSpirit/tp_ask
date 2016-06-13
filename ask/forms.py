@@ -244,17 +244,13 @@ class AddQuestionForm(forms.Form):
 
     def clean_title(self):
         title = self.cleaned_data['title']
-        if len(title) > 128:
+        if len(title) < 60:
             raise forms.ValidationError(
-                u'Заголовок слишком длинный', code=1)
+                u'Title is too short. It should be between 60 and 128 characters. Now it has ' + str(len(title)), code=1)
         return title
 
     def clean_tags(self):
         tags = self.cleaned_data['tags']
-        if len(tags) > 128:
-            raise forms.ValidationError(
-                u'Пожалуйста, используйте меньше тегов или сократите их длинну', code=2)
-
         tags = tags.replace(" ", "")
         return tags
 
