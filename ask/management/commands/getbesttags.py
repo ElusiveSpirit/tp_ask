@@ -8,6 +8,7 @@ class Command(BaseCommand):
     help = 'Script to create cache for best tags'
 
     days = 90 # entered__gte=datetime.now()-timedelta(days=self.days)
+    amount_to_select = 10
 
     def handle(self, *args, **options):
         self.stdout.write('Start request to find best tags')
@@ -21,7 +22,7 @@ class Command(BaseCommand):
                 except:
                     tags[t.text] = 1
 
-        tags = sorted(tags, key=tags.__getitem__, reverse=True)[:10]
+        tags = sorted(tags, key=tags.__getitem__, reverse=True)[:self.amount_to_select]
 
         self.stdout.write('Tags:')
         for t in tags:

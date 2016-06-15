@@ -29,6 +29,8 @@ def best_tags():
         'best_tags' : tags_with_classes
     }
 
-@register.simple_tag
-def hello():
-    return "Hello world"
+@register.inclusion_tag('ask/includes/best_members.html')
+def best_members():
+    return {
+        'best_members' : cache.get('best_members')
+    }

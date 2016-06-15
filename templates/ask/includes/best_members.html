@@ -1,0 +1,10 @@
+<div class=" ask-margin-top sidebar-module">
+  <div class="ask-container">
+    <h2>Best Members</h2>
+    {% for m in best_members %}
+      <a href="{% url 'ask:profile-detail' m.pk %}">
+        <h4>{{ m.nickname }}</h4>
+      </a>
+    {% endfor %}
+  </div>
+</div>
