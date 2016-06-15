@@ -20,6 +20,9 @@ class Profile(User):
     avatar = models.FileField(max_length=100, blank=True, default="avatar.png")
     objects = UserManager()
 
+    def get_absolute_url(self):
+        return reverse('ask:profile-detail', kwargs={'pk':self.pk})
+
     def get_avatar_url(self):
         return '/uploads/' + self.avatar.url
 

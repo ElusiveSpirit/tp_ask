@@ -1,6 +1,9 @@
-h3 span.ask-correct-asnwer {
+.ask-correct-asnwer {
     float: right;
     font-size: smaller;
+}
+
+span.ask-correct-asnwer {
     color: #3c763d;
 }
 

@@ -266,6 +266,16 @@ def question_details(request, pk):
     })
 
 
+class profile_detail(generic.DetailView):
+        model = Profile
+        context_object_name = 'profile'
+
+        def get_context_data(self, **kwargs):
+            context = super(profile_detail, self).get_context_data(**kwargs)
+            context['question_list'] = Question.objects.filter(author=context['profile'])
+            return context
+
+
 @login_required
 def profile_detail_edit(request):
     has_changed = False

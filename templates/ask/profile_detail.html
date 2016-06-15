@@ -1,0 +1,39 @@
+{% extends "ask/base.html" %}
+
+{% block content %}
+  <div class="col-md-10 col-md-offset-2">
+    <div class="ask-title ask-container">
+      {% comment %} Replace with first_name {% endcomment %}
+      <h2>{{ profile.username }}
+        {% if request.user = profile %}
+          <a href="{% url "ask:profile-detail-edit" %}" class="ask-correct-asnwer">Edit</a>
+        {% endif %}
+      </h2>
+    </div>
+    <!--</div>-->
+    <div class="ask-container ask-margin-top">
+      <div class="media">
+        <div class="media-left ask-no-padding">
+            <div class="media-object">
+              <img class="ask-img-list" src="{{ profile.get_avatar_url }}"/>
+            </div>
+        </div>
+        <div class="media-body ask-question-main">
+          <div class=" ask-question-inside-block">
+            <p>
+              Email: {{ profile.email }}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="ask-container ask-margin-top">
+      <h3>User's questions:</h3>
+      <ul>
+        {% for q in question_list %}
+          <li><a href="{{ q.get_absolute_url }}">{{ q.title }}</a></li>
+        {% endfor %}
+      </ul>
+    </diV>
+  </div>
+{% endblock %}

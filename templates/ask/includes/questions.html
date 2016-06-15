@@ -3,10 +3,12 @@
     <div class="media">
         <div class="media-left ask-no-padding">
             <div class="media-object">
+              <a href="{{ question.author.get_absolute_url }}">
                 <img class="ask-img-list" src="/css/abstract.jpeg"/>
-                <div class=" ask-question-form">
-                  {% include "ask/includes/rating.html" with object=question type="question" %}
-                </div>
+              </a>
+              <div class=" ask-question-form">
+                {% include "ask/includes/rating.html" with object=question type="question" %}
+              </div>
             </div>
         </div>
         <div class="media-body ask-question-main">

@@ -46,7 +46,7 @@
         {% else %}
             {% include "ask/includes/nav_login_block.html" %}
         {% endif %}
-        <form onsubmit="" id="nav_form" class="navbar-form navbar-right" role="search" method="GET">
+        <form action="{% url 'ask:index' %}" id="nav_form" class="navbar-form navbar-right" role="search" method="GET">
           {% block nav_bar_form %}{% endblock %}
           <div class="form-group">
             {% if tag == "None" %}
