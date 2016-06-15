@@ -40,8 +40,6 @@ def get_paginator(objects, page, limit):
     return ( page.object_list, paginator, page )
 
 
-
-
 def paginator_list(request):
     questions = Question.objects.all()
     limit = request.GET.get('limit', 10)
@@ -55,16 +53,23 @@ def paginator_list(request):
     })
 
 
-def tag_list(request, tag):
-    questions = Question.objects.by_tag(tag)
+class TagList(generic.ListView):
+    template_name = 'ask/question_list.html'
 
-    return render(request, 'ask/question_list.html', {
-        'question_list' : questions[0:10],
-        'tag' : tag,
-    })
+    def get(self, request, *args, **kwargs):
+        self.tag = kwargs.get('tag')
+        self.queryset = Question.objects.by_tag(self.tag)[:10]
+        return super(TagList, self).get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(TagList, self).get_context_data(**kwargs)
+        context['tag'] = self.tag
+        return context
 
 
 class HotListView(generic.ListView):
+    template_name = 'ask/question_list.html'
+
     def get_queryset(self):
         return Question.objects.best()[0:10]
 
@@ -72,11 +77,6 @@ class HotListView(generic.ListView):
         context = super(HotListView, self).get_context_data(**kwargs)
         context['best'] = 'True'
         return context
-
-
-class QuestionListView(generic.ListView):
-    def get_queryset(self):
-        return Question.objects.all()[0:10]
 
 
 @require_GET
@@ -101,10 +101,6 @@ def question_get_list(request):
         questions = Question.objects.best()
     else:
         questions = Question.objects.all()
-
-    #size = questions.count()
-    #if (int(since) >= size):
-    #    raise Http404("There is no so many objects yet")
 
     return render(request, 'ask/includes/questions.html', {
         'question_list' : questions[int(since) : int(since) + 10],

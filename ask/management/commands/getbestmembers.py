@@ -10,6 +10,7 @@ class Command(BaseCommand):
     # Params
     days = 90 # created_at__gt=datetime.now()-timedelta(days=self.days)
     amount_to_select = 5
+    cache_time = 360000
 
     def handle(self, *args, **options):
         self.stdout.write('Start request to find best members')
@@ -39,6 +40,6 @@ class Command(BaseCommand):
             })
             self.stdout.write(m.first_name)
 
-        cache.set('best_members', new_members_list, 3600)
+        cache.set('best_members', new_members_list, self.cache_time)
 
         self.stdout.write('Finish calculating members')

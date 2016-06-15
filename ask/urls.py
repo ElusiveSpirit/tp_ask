@@ -1,6 +1,8 @@
 from django.conf.urls import url
+from django.views.generic import ListView
 
 from ask import views as ask_views
+from ask.models import Question
 
 urlpatterns = [
     # private urls
@@ -22,7 +24,9 @@ urlpatterns = [
     url(r'^get_questions_list/*', ask_views.question_get_list, name='questions-get-list'),
     url(r'^hot/', ask_views.HotListView.as_view(), name='best-list'),
     url(r'^profile/(?P<pk>\d+)/$', ask_views.profile_detail.as_view(), name='profile-detail'),
-    url(r'^tag/(?P<tag>[A-z0-9_-]+)/$', ask_views.tag_list, name='tag-list'),
+    url(r'^tag/(?P<tag>[A-z0-9_-]+)/$', ask_views.TagList.as_view(), name='tag-list'),
     url(r'^question/(?P<pk>\d+)/(#\d+)?$', ask_views.question_details, name='question-detail'),
-    url(r'^', ask_views.QuestionListView.as_view(), name='index'),
+    url(r'^', ListView.as_view(
+        queryset=Question.objects.all()[0:10]
+    ), name='index'),
 ]

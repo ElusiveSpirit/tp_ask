@@ -74,13 +74,14 @@ class LikedMethods():
 class QuestionManager(models.Manager):
     def best(self):
         one_year_ago = datetime.datetime.now() - datetime.timedelta(days=100)
-        return self.filter(created_at__gt=one_year_ago).order_by('-rating', '-created_at')
+        questions = self.filter(created_at__gt=one_year_ago)
+        # Create cache value
+        return questions
 
     def new(self):
         return self
 
     def by_tag(self, tag):
-        print(tag)
         tag = Tag.objects.filter(text=tag)
         return self.filter(tags__in=tag)
 

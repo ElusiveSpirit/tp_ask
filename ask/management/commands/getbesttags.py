@@ -9,6 +9,7 @@ class Command(BaseCommand):
 
     days = 90 # entered__gte=datetime.now()-timedelta(days=self.days)
     amount_to_select = 10
+    cache_time = 360000
 
     def handle(self, *args, **options):
         self.stdout.write('Start request to find best tags')
@@ -28,6 +29,6 @@ class Command(BaseCommand):
         for t in tags:
             self.stdout.write(t)
 
-        cache.set('best_tags', tags, 3600)
+        cache.set('best_tags', tags, self.cache_time)
 
         self.stdout.write('Finish calculating tags')
