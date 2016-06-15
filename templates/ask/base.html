@@ -1,3 +1,5 @@
+{% load ask_best %}
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -78,16 +80,7 @@
 
             </div>
             <div class="col-md-3 col-md-offset-1 blog-sidebar">
-                <div class=" ask-margin-top sidebar-module">
-                    <div class="ask-container">
-                        <h2>Popular tags</h2>
-                        <h3>
-                            perl <span class="text-danger">python</span> Technopark
-                            <span class="text-danger">MySQL</span> <span class="text-success">django</span>
-                            Mail.ru Voloshin <span class="text-warning">Firefox</span>
-                        </h3>
-                    </div>
-                </div>
+                {% best_tags %}
                 <div class=" ask-margin-top sidebar-module">
                     <div class="ask-container">
                             <h2>Best Members</h2>

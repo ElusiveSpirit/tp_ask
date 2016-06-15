@@ -1,0 +1,10 @@
+<div class=" ask-margin-top sidebar-module">
+  <div class="ask-container">
+    <h2>Popular tags</h2>
+    <h3>
+      {% for t in best_tags %}
+        <a href="{% url 'ask:tag-list' t.tag %}"><span class="{{ t.class }}">{{ t.tag }}</span></a>
+      {% endfor %}
+    </h3>
+  </div>
+</div>

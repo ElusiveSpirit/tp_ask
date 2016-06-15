@@ -244,14 +244,20 @@ class AddQuestionForm(forms.Form):
 
     def clean_title(self):
         title = self.cleaned_data['title']
-        if len(title) < 60:
+        if len(title) < 30:
             raise forms.ValidationError(
-                u'Title is too short. It should be between 60 and 128 characters. Now it has ' + str(len(title)), code=1)
+                u'Title is too short. It should be between 30 and 128 characters. Now it has ' + str(len(title)), code=1)
         return title
 
     def clean_tags(self):
         tags = self.cleaned_data['tags']
         tags = tags.replace(" ", "")
+        tags = tags.split(",")
+        for t in tags:
+            if not re.match(r"^[A-Za-z0-9_-]+$", t):
+                raise forms.ValidationError(
+                    u'Use only letters, decimals and _ or - in tags', code=1)
+
         return tags
 
     def save(self, profile):
@@ -260,9 +266,7 @@ class AddQuestionForm(forms.Form):
             title=self.cleaned_data['title'],
             content=self.cleaned_data['content'],
         )
-        tags = self.cleaned_data['tags'];
-        tags = tags.split(",")
-        for tag in tags:
+        for tag in self.cleaned_data['tags']:
             obj, created = Tag.objects.get_or_create(text=tag)
             question.tags.add(obj)
 

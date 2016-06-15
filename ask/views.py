@@ -4,6 +4,7 @@ import json
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -37,6 +38,8 @@ def get_paginator(objects, page, limit):
     paginator.baseurl = '/paginator/?page='
     page = paginator.page(page)
     return ( page.object_list, paginator, page )
+
+
 
 
 def paginator_list(request):
