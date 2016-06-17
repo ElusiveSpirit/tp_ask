@@ -1,5 +1,7 @@
 import datetime
 import json
+import _thread
+import requests
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
@@ -17,6 +19,11 @@ from ask.models import Tag, Profile, Question, Answer, Like
 from ask.forms import AuthForm, AddQuestionForm, TestUpload, RegistrationForm
 from ask.forms import EditProfileForm, AddAnswerForm, AddLikeForm, CorrectAnswerForm
 from ask.models import TestUpload as Upload
+
+
+# send update to notification server in new thread
+def push_updates(update):
+    requests.post("http://localhost:8888/push", data=update)
 
 
 # A paginator func for any objects lists
@@ -249,6 +256,16 @@ def add_answer(request):
             question=question
         )
         anchor = answer.get_anchor()
+
+        # send notification in new thread
+        _thread.start_new_thread(push_updates, ({
+            'channel' : question.pk,
+            'answer' : render(request, 'ask/includes/answer.html', {
+                'question' : question,
+                'answer' : answer,
+            }),
+        },))
+
         return redirect(question.get_url_with_answer_anchor(anchor))
     try:
         return redirect(reverse('ask:question-detail', pk=request.POST.get('question_id')))

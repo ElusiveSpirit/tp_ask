@@ -1,6 +1,7 @@
 {% extends "ask/base.html" %}
 
 {% block content %}
+<div id="channel_id" style="display: none;">{{ question.pk }}</div>
 <div class="row">
   <div class="col-md-2 ">
     <img class="ask-container ask-no-padding " src="/css/abstractbig.jpeg"/>
@@ -24,6 +25,7 @@
     {% for answer in answer_list %}
       {% include "ask/includes/answer.html" %}
     {% endfor %}
+    <div id="fresh_answers"></div>
     <div class="ask-margin-top ask-no-padding">
     {% if request.user.is_authenticated %}
       <form method="POST"  action="{% url "ask:add-answer" %}">
@@ -47,4 +49,8 @@
 </div>
     <!-- end-container-main -->
 
+{% endblock %}
+
+{% block js %}
+  <script src="/js/notifications.js"></script>
 {% endblock %}
