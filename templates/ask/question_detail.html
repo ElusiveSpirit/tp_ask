@@ -4,7 +4,7 @@
 <div id="channel_id" style="display: none;">{{ question.pk }}</div>
 <div class="row">
   <div class="col-md-2 ">
-    <img class="ask-container ask-no-padding " src="/css/abstractbig.jpeg"/>
+    <img class="ask-container ask-no-padding " src="{{ question.author.get_avatar_url }}" width="125" height="125"/>
     <div class="ask-question-form-detail ">
       {% include "ask/includes/rating.html" with object=question type="question" %}
     </div>

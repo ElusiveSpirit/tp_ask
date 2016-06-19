@@ -4,7 +4,7 @@
   <div class="col-md-10 col-md-offset-2">
     <div class="ask-title ask-container">
       {% comment %} Replace with first_name {% endcomment %}
-      <h2>{{ profile.username }}
+      <h2>{{ profile.first_name }}
         {% if request.user = profile %}
           <a href="{% url "ask:profile-detail-edit" %}" class="ask-correct-asnwer">Edit</a>
         {% endif %}

@@ -8,7 +8,7 @@
         <!--</div>-->
         <div class="ask-container ask-margin-top">
             <form id="formLogIn" class="form-horizontal ask-margin-top
-                {% if form.non_field_errors %} has-error{% endif %}
+                {% if login_error %} has-error{% endif %}
                 " action="{% url 'ask:signin' %}" method="POST">
 
               {% csrf_token %}

@@ -2,7 +2,9 @@
   <div class="media">
     <div class="media-left ask-no-padding">
       <div class="media-object">
-        <img class="ask-container ask-no-padding ask-img-list ask-question-detail" src="/css/abstract.jpeg"/>
+        <a href="{{ answer.author.get_absolute_url }}">
+          <img class="ask-container ask-no-padding ask-img-list ask-question-detail" src="{{ answer.author.get_avatar_url }}"/>
+        </a>
         <div class=" ask-question-form-answer">
           {% include "ask/includes/rating.html" with object=answer type="answer" %}
         </div>
