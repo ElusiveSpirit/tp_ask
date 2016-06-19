@@ -11,13 +11,13 @@
     <div class="media-body ask-question-inside-block">
       <div class="ask-container">
         <p>{{ answer.content }}</p>
-        {% if answer.is_correct or question.author == request.user %}
+        {% if answer.is_correct or question.author == user %}
           <div class="caption">
             <div class="checkbox has-success">
               <label>
                 <input type="checkbox" onclick="correctAnswer(this, {{ answer.id }}, {{ question.id }})"
                   {% if answer.is_correct %}checked{% endif %}
-                  {% if question.author != request.user %}disabled{% endif %}> Correct!
+                  {% if question.author != user %}disabled{% endif %}> Correct!
               </label>
             </div>
           </div>

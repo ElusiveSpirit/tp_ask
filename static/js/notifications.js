@@ -1,6 +1,10 @@
 var channel_id = $("div#channel_id").html();  // opened question id
 var ws = new WebSocket("ws://localhost:8888/ws/" + channel_id);
 
+ws.onopen = function() {
+    ws.send(JSON.stringify({ 'u_id' : u_id }));
+}
+
 ws.onmessage = function(ev){
   // console.log("GOT");
   // var json = JSON.parse(ev.data);

@@ -20,8 +20,15 @@ class SocketHandler(websocket.WebSocketHandler):
             if channel_id not in subs:
                 subs[channel_id] = []
             if self not in subs[channel_id]:
-                subs[channel_id].append(self)
+                subs[channel_id].append(self)	
 
+    def on_message(self, message):
+        data = json.loads(message)
+        try:
+            self.u_id = data['u_id']
+        except:
+            self.u_id = -1
+    
     def on_close(self):
         for i in subs.keys():
             if self in subs[i]:
@@ -37,10 +44,16 @@ class ApiHandler(web.RequestHandler):
         # data = json.dumps({
         #        "answer": self.get_argument("answer"),
         #    })
-        data = self.get_argument("answer")
+        a_id = self.get_argument('a_id')
+        author_answer = self.get_argument("author_answer")
+        common_answer = self.get_argument("common_answer")
         if channel_id in subs:
             for c in subs[channel_id]:
-                c.write_message(data)
+                if str(c.u_id) == str(a_id):
+                    c.write_message(author_answer)
+                else:    
+                    print('user')
+                    c.write_message(common_answer)
 
 
 # daemon stuff

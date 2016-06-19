@@ -23,7 +23,7 @@
       </div>
     </div>
     {% for answer in answer_list %}
-      {% include "ask/includes/answer.html" %}
+      {% include "ask/includes/answer.html" with user=request.user %}
     {% endfor %}
     <div id="fresh_answers"></div>
     <div class="ask-margin-top ask-no-padding">
@@ -52,5 +52,10 @@
 {% endblock %}
 
 {% block js %}
-  <script src="/js/notifications.js"></script>
+  {% if request.user.is_authenticated %}
+      <script>u_id = {{ request.user.pk }};</script>
+  {% else %}
+      <script>u_id = -1;</script>
+  {% endif %}
+      <script src="/js/notifications.js"></script>
 {% endblock %}

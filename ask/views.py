@@ -3,7 +3,7 @@ import json
 import _thread
 import requests
 
-from django.shortcuts import render, get_object_or_404, redirect
+from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
 from django.core.cache import cache
@@ -58,6 +58,10 @@ def paginator_list(request):
         'question_list' : questions,
         'paginator': paginator, 'page': page,
     })
+
+
+def tag_redirect(request):
+    return redirect(reverse('ask:tag-list', kwargs={'tag' : request.GET.get('tag')}))
 
 
 class TagList(generic.ListView):
@@ -259,8 +263,15 @@ def add_answer(request):
 
         # send notification in new thread
         _thread.start_new_thread(push_updates, ({
+            # TODO Must think about render for different people. Onwer and other.
             'channel' : question.pk,
-            'answer' : render(request, 'ask/includes/answer.html', {
+            'a_id' : question.author.pk,
+            'common_answer' : render_to_response('ask/includes/answer.html', {
+                'question' : question,
+                'answer' : answer,
+            }),
+            'author_answer' : render_to_response('ask/includes/answer.html', {
+                'user' : question.author,
                 'question' : question,
                 'answer' : answer,
             }),
