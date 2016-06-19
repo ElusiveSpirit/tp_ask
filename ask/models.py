@@ -1,8 +1,9 @@
 import datetime
+
+from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.db import models
 from django.contrib.auth.models import User, UserManager
-# Create your models here.
 
 
 class TestUpload(models.Model):
@@ -73,10 +74,7 @@ class LikedMethods():
 
 class QuestionManager(models.Manager):
     def best(self):
-        one_year_ago = datetime.datetime.now() - datetime.timedelta(days=100)
-        questions = self.filter(created_at__gt=one_year_ago)
-        # Create cache value
-        return questions
+        return cache.get('question_list_best')
 
     def new(self):
         return self

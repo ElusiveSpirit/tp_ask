@@ -6,7 +6,6 @@ import requests
 from django.shortcuts import render, get_object_or_404, redirect, render_to_response
 from django.http import HttpResponse, HttpResponseNotFound, HttpResponseRedirect, Http404
 from django.core.paginator import Paginator
-from django.core.cache import cache
 from django.core.urlresolvers import reverse
 from django.views import generic
 from django.views.decorators.csrf import csrf_exempt
@@ -80,9 +79,8 @@ class TagList(generic.ListView):
 
 class HotListView(generic.ListView):
     template_name = 'ask/question_list.html'
-
-    def get_queryset(self):
-        return Question.objects.best()[0:10]
+    context_object_name = 'question_list'
+    queryset = Question.objects.best()[0:10]
 
     def get_context_data(self, **kwargs):
         context = super(HotListView, self).get_context_data(**kwargs)
@@ -101,11 +99,7 @@ def question_get_list(request):
         tag = "None"
     best = request.GET.get("best", "None")
 
-    if tag != "None" and best == "True":
-        one_year_ago = datetime.datetime.now() - datetime.timedelta(days=100)
-        tag_object = Tag.objects.filter(text=tag)
-        questions = Question.objects.filter(created_at__gt=one_year_ago, tags__in=tag_object).order_by('-rating', '-created_at')
-    elif tag != "None":
+    if tag != "None":
         questions = Question.objects.byTag(tag)
     elif best == "True":
         print("best")
